@@ -1,0 +1,25 @@
+{
+  "name": "jd_rest_cli",
+  "version": "0.0.5",
+  "description": "Ultra simple rest cli without dependency",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdarrort/jd_rest_cli.git"
+  },
+  "keywords": [
+    "nodejs",
+    "rest",
+    "cli",
+    "simplified"
+  ],
+  "author": "Julien Darrort",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jdarrort/jd_rest_cli/issues"
+  },
+  "homepage": "https://github.com/jdarrort/jd_rest_cli#readme"
+}
