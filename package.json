@@ -1,6 +1,6 @@
 {
-  "name": "jd-rest-cli",
-  "version": "0.1.0",
+  "name": "jd_rest_cli",
+  "version": "0.1.1",
   "description": "Ultra simple rest cli without dependency",
   "main": "index.js",
   "scripts": {
@@ -8,10 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jdarrort/jd_rest_cli.git"
+    "url": "git+https://github.com/jdarrort/jd-rest-cli.git"
   },
   "keywords": [
-    "nodejs",
+    "node",
     "rest",
     "cli",
     "simplified"
@@ -19,7 +19,7 @@
   "author": "Julien Darrort",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jdarrort/jd_rest_cli/issues"
+    "url": "https://github.com/jdarrort/jd-rest-cli/issues"
   },
-  "homepage": "https://github.com/jdarrort/jd_rest_cli#readme"
+  "homepage": "https://github.com/jdarrort/jd-rest-cli#readme"
 }
