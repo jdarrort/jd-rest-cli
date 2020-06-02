@@ -3,11 +3,11 @@ var URL = require("url");
 
 class RestRequest {
     constructor(method, in_url) {
-        this.opts =  URL.parse(in_url);
-        this.opts.method = method;
-        this.opts.headers={};
-        this.opts.body=null;
-        this.opts.query;
+        this._opts =  URL.parse(in_url);
+        this._opts.method = method;
+        this._opts.headers={};
+        this._opts.body="";
+        this._opts.query;
     }
     static get(url) {
         return new RestRequest("GET", url);
@@ -24,38 +24,42 @@ class RestRequest {
     static delete(url) {
         return new RestRequest("DELETE", url);
     }
+    opts(in_opts){
+        this._opts = Object.assign( this._opts, in_opts);
+        return this;
+    }
+
     headers(in_hdr){
-        this.opts.headers = Object.assign( this.opts.headers, in_hdr);
+        this._opts.headers = Object.assign( this._opts.headers, in_hdr);
         return this;
     }
     query(in_query_params){
-        this.opts.query = in_query_params ;
+        this._opts.query = in_query_params ;
         return this;
     }    
     form(in_form){
         let tmp = []
         Object.keys(in_form).forEach( k => tmp.push(k +"="+encodeURIComponent(in_form[k])));
-        this.opts.body = tmp.join("&");
-        this.opts.headers["Content-Type"] = "application/x-www-form-urlencoded";
-        this.opts.headers["Content-Length"] = this.opts.body.length;
+        this._opts.body = tmp.join("&");
+        this._opts.headers["Content-Type"] = "application/x-www-form-urlencoded";
         return this;
     }
     json( in_json ) {
-        this.opts.body = JSON.stringify(in_json);
-        this.opts.headers["Content-Type"] = "application/json";
-        this.opts.headers["Content-Length"] = this.opts.body.length;
+        this._opts.body = JSON.stringify(in_json);
+        this._opts.headers["Content-Type"] = "application/json";
         return this;
     }
     async send(){ 
-        let httx = this.opts.protocol.match(/^https/) ? require("https") : require("http");
-        if (this.opts.query) {
+        this._opts.headers["Content-Length"] = this._opts.body.length;
+        let httx = this._opts.protocol.match(/^https/) ? require("https") : require("http");
+        if (this._opts.query) {
             let tmp = []
-            Object.keys(this.opts.query).forEach( k => tmp.push(k +"="+encodeURIComponent(this.opts.query[k])));
+            Object.keys(this._opts.query).forEach( k => tmp.push(k +"="+encodeURIComponent(this._opts.query[k])));
             tmp.join("&");
-            this.opts.path = [this.opts.path, tmp].join("?");
+            this._opts.path = [this._opts.path, tmp].join("?");
         }
         return new Promise( (resolve, reject) => {
-            var req = httx.request(this.opts, (res) => {
+            var req = httx.request(this._opts, (res) => {
                 var body_result = "";
                 var results = {};
                 results.statusCode = res.statusCode;
@@ -76,8 +80,8 @@ class RestRequest {
             req.on("error", e => {
                 reject(e);
             });
-            if ( this.opts.body && this.opts.body.length > 0 ) {
-                req.write( this.opts.body );
+            if ( this._opts.body && this._opts.body.length > 0 ) {
+                req.write( this._opts.body );
             } else {
                 req.end();
             }
