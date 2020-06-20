@@ -7,7 +7,15 @@ class RestRequest {
         this._opts.method = method;
         this._opts.headers={};
         this._opts.body="";
-        this._opts.query;
+        if (this._opts.query) {
+            let tmp = this._opts.query.split("&");
+            this._opts.query={};
+            tmp.forEach( t => {
+                let tmp2 = t.split("=");
+                this._opts.query[tmp2[0]] = tmp2[1];
+            })
+        }
+        this._opts.query = this._opts.query || {};
     }
     static get(url) {
         return new RestRequest("GET", url);
@@ -34,7 +42,7 @@ class RestRequest {
         return this;
     }
     query(in_query_params){
-        this._opts.query = in_query_params ;
+        this._opts.query = Object.assign(this._opts.query, in_query_params);
         return this;
     }    
     form(in_form){
