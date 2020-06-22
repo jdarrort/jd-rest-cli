@@ -57,7 +57,14 @@ class RestRequest {
         this._opts.headers["Content-Type"] = "application/json";
         return this;
     }
-    async send(){ 
+    async send(in_data){ 
+        if (in_data){
+            if (typeof in_data === "object") {
+                this._opts.body = JSON.stringify(in_data);
+            } else if (typeof in_data === "string") {
+                this._opts.body = in_data;
+            }
+        }        
         this._opts.headers["Content-Length"] = this._opts.body.length;
         let httx = this._opts.protocol.match(/^https/) ? require("https") : require("http");
         if (this._opts.query) {

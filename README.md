@@ -5,8 +5,8 @@ Usage
 RestCli = require('jd-rest-cli');
 
 RestCli.get( "http://my.domain.com/api/test" )
-.headers( { authorization : "Bearer 1234" } )
 .opts({timeout : 20}) 
+.headers( { authorization : "Bearer 1234" } )
 .query( { search : "something") } )
 .send()
 .then( r => { console.log(` StatusCode : ${res.statusCode}\n${res.body}\n${JSON.stringify(res.headers)}`); })
@@ -17,10 +17,21 @@ RestCli.get( "http://my.domain.com/api/test" )
 .then( r => { console.log(` StatusCode : ${res.statusCode}\n${res.body}\n${JSON.stringify(res.headers)}`); })
 
 RestCli.get( "http://my.domain.com/api/test" )
-.send({
+.json({
     jsonBodyAttr1: 1,
     jsonBodyAttr2: "tata"
 })
+.send()
+.then( r => { return r; })
+
+
+RestCli.get( "http://my.domain.com/api/test" )
+.send("Something")
 .then( r => { return r; })
 
 ```
+
+return object with 
+ - statusCode : int
+ - headers : object
+ - body  : (mixed) : converted to JSON if response content-type contains json
