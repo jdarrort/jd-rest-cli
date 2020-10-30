@@ -3,16 +3,25 @@ var URL = require("url");
 
 class RestRequest {
     constructor(method, in_url) {
-        this._opts =  URL.parse(in_url);
+        // this._opts =  URL.parse(in_url);
+        let opts = URL.parse(in_url);
+        this._opts = {
+            host : opts.host,
+            path : opts.pathname,
+            port : opts.port,
+            protocol : opts.protocol,
+            query: {}
+        }
         this._opts.method = method;
         this._opts.headers={};
         this._opts.body="";
-        if (this._opts.query) {
-            let tmp = this._opts.query.split("&");
-            this._opts.query={};
+        if (opts.query) {
+            let tmp = opts.query.split("&");
             tmp.forEach( t => {
-                let tmp2 = t.split("=");
-                this._opts.query[tmp2[0]] = tmp2[1];
+                let idx = t.indexOf("=");
+                if (idx > 0) {
+                    this._opts.query[t.slice(0,idx)] = t.slice(idx+1);
+                }
             })
         }
         this._opts.query = this._opts.query || {};
@@ -68,9 +77,7 @@ class RestRequest {
         this._opts.headers["Content-Length"] = this._opts.body.length;
         let httx = this._opts.protocol.match(/^https/) ? require("https") : require("http");
         if (this._opts.query) {
-            let tmp = []
-            Object.keys(this._opts.query).forEach( k => tmp.push(k +"="+encodeURIComponent(this._opts.query[k])));
-            tmp.join("&");
+            let tmp = Object.entries(this._opts.query).map(kv => kv.map(encodeURIComponent).join("=")).join("&")            
             this._opts.path = [this._opts.path, tmp].join("?");
         }
         return new Promise( (resolve, reject) => {
