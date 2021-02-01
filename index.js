@@ -6,7 +6,7 @@ class RestRequest {
         // this._opts =  URL.parse(in_url);
         let opts = URL.parse(in_url);
         this._opts = {
-            host : opts.host,
+            host : opts.hostname,
             path : opts.pathname,
             port : opts.port,
             protocol : opts.protocol,
@@ -63,7 +63,7 @@ class RestRequest {
     }
     json( in_json ) {
         this._opts.body = JSON.stringify(in_json);
-        this._opts.headers["Content-Type"] = "application/json";
+        this._opts.headers["Content-Type"] = "application/json; charset=utf-8";
         return this;
     }
     async send(in_data){ 
@@ -74,9 +74,10 @@ class RestRequest {
                 this._opts.body = in_data;
             }
         }        
-        this._opts.headers["Content-Length"] = this._opts.body.length;
+        //Buffer.byteLength
+        this._opts.headers["Content-Length"] = Buffer.byteLength(this._opts.body); // Can not use 'this._opts.body.length', cause some char uses more than 1 byte over http/utf8;
         let httx = this._opts.protocol.match(/^https/) ? require("https") : require("http");
-        if (this._opts.query) {
+        if (Object.keys(this._opts.query).length) {
             let tmp = Object.entries(this._opts.query).map(kv => kv.map(encodeURIComponent).join("=")).join("&")            
             this._opts.path = [this._opts.path, tmp].join("?");
         }
@@ -86,17 +87,16 @@ class RestRequest {
                 var results = {};
                 results.statusCode = res.statusCode;
                 results.headers = res.headers;
-                results.body=null;
+                results.body = null;
                 res.on('data', (chunk) => { body_result += chunk;}); 
                 res.on('end', () =>  { 
-                    if (results.statusCode == 200) {
-                        if ( /json/.test(results.headers["content-type"]) ) {
-                            results.body = JSON.parse(body_result);
-                        } else {
-                            results.body = body_result;
-                        }
+                    if (results.statusCode > 299) {return reject(results)}
+                    if ( /json/.test(results.headers["content-type"]) ) {
+                        results.body = JSON.parse(body_result);
+                    } else {
+                        results.body = body_result;
                     }
-                    resolve(results);
+                    return resolve(results.body);
                 });
             });
             req.on("error", e => {
