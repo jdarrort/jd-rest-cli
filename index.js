@@ -6,7 +6,7 @@ class RestRequest {
         // this._opts =  URL.parse(in_url);
         let opts = URL.parse(in_url);
         this._opts = {
-            host : opts.host,
+            host : opts.hostname,
             path : opts.pathname,
             port : opts.port,
             protocol : opts.protocol,
@@ -76,7 +76,7 @@ class RestRequest {
         }        
         this._opts.headers["Content-Length"] = this._opts.body.length;
         let httx = this._opts.protocol.match(/^https/) ? require("https") : require("http");
-        if (this._opts.query) {
+        if (Object.keys(this._opts.query).length) {        
             let tmp = Object.entries(this._opts.query).map(kv => kv.map(encodeURIComponent).join("=")).join("&")            
             this._opts.path = [this._opts.path, tmp].join("?");
         }
