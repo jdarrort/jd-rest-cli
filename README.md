@@ -31,6 +31,13 @@ RestCli.get( "http://my.domain.com/api/test" )
 
 ```
 
+Possibility to set an external Authorization Header handler (async)
+```javascript
+RestCli.setAuthHandler(async function() { return "Bearer MyComputedBearer})
+// and to inhibit for a specific call (for exemple the one to retrieve external AccessToken)
+RestCli.post("http://localhost").noauth().send();
+```
+
 return object with 
  - statusCode : int
  - headers : object

@@ -19,12 +19,12 @@ RestCli.setAuthHandler(function() {
 });
 
 app.listen( 5719, () => {
-    RestCli.get("http://localhost:5719/test?id=123").query({special : "My Special"}).send()
+     RestCli.get("http://localhost:5719/test?id=123").query({special : "My Special"}).send()
+    // RestCli.get("http://localhost:5719/test?id=123").noauth().query({special : "My Special"}).send()
     .then((d) => {
         console.log(d);
         process.exit();
     })
-    
 })
 
 

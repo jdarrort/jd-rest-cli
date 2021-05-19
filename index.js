@@ -11,6 +11,7 @@ class RestRequest {
             protocol : opts.protocol,
             query: {}
         }
+        this._noauth = false;
         this._opts.method = method;
         this._opts.headers={};
         this._opts.body="";
@@ -44,7 +45,11 @@ class RestRequest {
         this._opts = Object.assign( this._opts, in_opts);
         return this;
     }
-
+    // Force NOT to exclude Authorization header handler.
+    noauth( ) {
+        this._noauth = true;
+        return this;
+    }
     headers(in_hdr){
         this._opts.headers = Object.assign( this._opts.headers, in_hdr);
         return this;
@@ -69,7 +74,7 @@ class RestRequest {
         return this;
     }
     async send(in_data){ 
-        if ( typeof RestRequest._authFn === "function" &&  ! this._opts.headers?.Authorization) {
+        if ( typeof RestRequest._authFn === "function" &&  ! this._opts.headers?.Authorization && !this._noauth) {
             this._opts.headers.Authorization = await RestRequest._authFn();
 
         }
