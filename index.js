@@ -1,10 +1,9 @@
-var URL = require("url");
 // Helper class to perform HTTP REST Requests;
 
 class RestRequest {
     constructor(method, in_url) {
         // this._opts =  URL.parse(in_url);
-        let opts = URL.parse(in_url);
+        let opts = new URL(in_url);
         this._opts = {
             host : opts.hostname,
             path : opts.pathname,
@@ -15,8 +14,8 @@ class RestRequest {
         this._opts.method = method;
         this._opts.headers={};
         this._opts.body="";
-        if (opts.query) {
-            let tmp = opts.query.split("&");
+        if (opts.search) {
+            let tmp = opts.search.replace(/^\?/,"").split("&");
             tmp.forEach( t => {
                 let idx = t.indexOf("=");
                 if (idx > 0) {
@@ -50,8 +49,11 @@ class RestRequest {
         this._opts.headers = Object.assign( this._opts.headers, in_hdr);
         return this;
     }
-    query(in_query_params){
-        this._opts.query = Object.assign(this._opts.query, in_query_params);
+    query(in_query_params = {}){
+        Object.entries(in_query_params).forEach(([a,b]) => {
+            this._opts.query[encodeURIComponent(a)] = encodeURIComponent(b);
+        });
+        //this._opts.query = Object.assign(this._opts.query, in_query_params);
         return this;
     }    
     form(in_form){
@@ -67,6 +69,10 @@ class RestRequest {
         return this;
     }
     async send(in_data){ 
+        if ( typeof RestRequest._authFn === "function" &&  ! this._opts.headers?.authorization) {
+            this._opts.headers.authorization = await RestRequest._authFn();
+
+        }
         if (in_data){
             if (typeof in_data === "object") {
                 this._opts.body = JSON.stringify(in_data);
@@ -110,4 +116,10 @@ class RestRequest {
         });
     }
 }
+RestRequest._authFn = null;
+RestRequest.setAuthHandler = function(auth_fn) {
+    RestRequest._authFn = auth_fn;
+}
+Object.freeze(RestRequest);
+
 module.exports = RestRequest;
