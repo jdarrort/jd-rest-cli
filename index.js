@@ -51,7 +51,7 @@ class RestRequest {
     }
     query(in_query_params = {}){
         Object.entries(in_query_params).forEach(([a,b]) => {
-            this._opts.query[encodeURIComponent(a)] = encodeURIComponent(b);
+            this._opts.query[a] = b;
         });
         //this._opts.query = Object.assign(this._opts.query, in_query_params);
         return this;
@@ -69,8 +69,8 @@ class RestRequest {
         return this;
     }
     async send(in_data){ 
-        if ( typeof RestRequest._authFn === "function" &&  ! this._opts.headers?.authorization) {
-            this._opts.headers.authorization = await RestRequest._authFn();
+        if ( typeof RestRequest._authFn === "function" &&  ! this._opts.headers?.Authorization) {
+            this._opts.headers.Authorization = await RestRequest._authFn();
 
         }
         if (in_data){
@@ -120,6 +120,5 @@ RestRequest._authFn = null;
 RestRequest.setAuthHandler = function(auth_fn) {
     RestRequest._authFn = auth_fn;
 }
-Object.freeze(RestRequest);
 
 module.exports = RestRequest;
