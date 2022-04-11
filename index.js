@@ -100,13 +100,13 @@ class RestRequest {
                 results.body=null;
                 res.on('data', (chunk) => { body_result += chunk;}); 
                 res.on('end', () =>  { 
-                    if (results.statusCode == 200) {
+                    try {
                         if ( /json/.test(results.headers["content-type"]) ) {
                             results.body = JSON.parse(body_result);
                         } else {
                             results.body = body_result;
                         }
-                    }
+                    } catch(e) {}
                     resolve(results);
                 });
             });
