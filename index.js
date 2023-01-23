@@ -80,9 +80,9 @@ class RestRequest {
         }
         if (in_data){
             if (typeof in_data === "object") {
-                this._opts.body = JSON.stringify(in_data);
+                this._opts.body = Buffer.from(JSON.stringify(in_data));
             } else if (typeof in_data === "string") {
-                this._opts.body = in_data;
+                this._opts.body = Buffer.from(in_data);
             }
         }        
         this._opts.headers["Content-Length"] = this._opts.body.length;
