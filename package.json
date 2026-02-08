@@ -1,6 +1,6 @@
 {
-  "name": "jd_rest_cli",
-  "version": "0.2.6",
+  "name": "@jda/rest-cli",
+  "version": "0.2.9",
   "description": "Ultra simple rest cli without dependency",
   "main": "index.js",
   "scripts": {

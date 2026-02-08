@@ -1,6 +1,12 @@
 // Helper class to perform HTTP REST Requests;
 
+const http = require("http");
+const https = require("https");
 class RestRequest {
+    static _authFn = null;
+    static setAuthHandler (auth_fn) {
+        RestRequest._authFn = auth_fn;
+    }
     constructor(method, in_url) {
         // this._opts =  URL.parse(in_url);
         let opts = new URL(in_url);
@@ -26,21 +32,11 @@ class RestRequest {
         }
         this._opts.query = this._opts.query || {};
     }
-    static get(url) {
-        return new RestRequest("GET", url);
-    }
-    static put(url) {
-        return new RestRequest("PUT", url);
-    }
-    static post(url) {
-        return new RestRequest("POST", url);
-    }
-    static patch(url) {
-        return new RestRequest("PATCH", url);
-    }
-    static delete(url) {
-        return new RestRequest("DELETE", url);
-    }
+    static get(url) { return new RestRequest("GET", url); }
+    static put(url) { return new RestRequest("PUT", url); }
+    static post(url) { return new RestRequest("POST", url); }
+    static patch(url) { return new RestRequest("PATCH", url);}
+    static delete(url) { return new RestRequest("DELETE", url); }
     opts(in_opts){
         this._opts = Object.assign( this._opts, in_opts);
         return this;
@@ -55,10 +51,7 @@ class RestRequest {
         return this;
     }
     query(in_query_params = {}){
-        Object.entries(in_query_params).forEach(([a,b]) => {
-            this._opts.query[a] = b;
-        });
-        //this._opts.query = Object.assign(this._opts.query, in_query_params);
+        this._opts.query = Object.assign( this._opts.query, in_query_params);
         return this;
     }    
     form(in_form){
@@ -76,7 +69,6 @@ class RestRequest {
     async send(in_data){ 
         if ( typeof RestRequest._authFn === "function" &&  ! this._opts.headers?.Authorization && !this._noauth) {
             this._opts.headers.Authorization = await RestRequest._authFn();
-
         }
         if (in_data){
             if (typeof in_data === "object") {
@@ -84,9 +76,12 @@ class RestRequest {
             } else if (typeof in_data === "string") {
                 this._opts.body = Buffer.from(in_data);
             }
-        }        
+        } else if (this._opts.body) {
+                this._opts.body = Buffer.from(this._opts.body);
+        }
+        
         this._opts.headers["Content-Length"] = this._opts.body.length;
-        let httx = this._opts.protocol.match(/^https/) ? require("https") : require("http");
+        let httx = this._opts.protocol.match(/^https/) ? https : http;
         if (Object.keys(this._opts.query).length) {        
             let tmp = Object.entries(this._opts.query).map(kv => kv.map(encodeURIComponent).join("=")).join("&")            
             this._opts.path = [this._opts.path, tmp].join("?");
@@ -120,10 +115,6 @@ class RestRequest {
             }
         });
     }
-}
-RestRequest._authFn = null;
-RestRequest.setAuthHandler = function(auth_fn) {
-    RestRequest._authFn = auth_fn;
 }
 
 module.exports = RestRequest;
